@@ -10,7 +10,7 @@ Below is an example of uploading a file using this repositories code:
 Below are instructions on how to run both the development and production environments of this repository.
 
 ### Development
-1. Build and run the Docker containers.
+1. Build and run the Docker containers..
 ```
 $ docker-compose up -d --build
 ```
