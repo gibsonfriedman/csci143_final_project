@@ -1,0 +1,52 @@
+/* Basic body styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+/* Styling for the main heading */
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+/* Navigation list styling */
+ol {
+    list-style-type: none;
+    padding: 0;
+    background-color: #333;
+    margin: 0;
+}
+
+ol li {
+    display: inline;
+    margin-right: 20px;
+}
+
+ol li a {
+    color: white;
+    text-decoration: none;
+    padding: 5px 20px;
+    background-color: #333;
+}
+
+ol li a:hover {
+    background-color: #555;
+}
+
+/* Styling for form inputs */
+input[type=text], input[type=password], textarea {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+input[type=submit] {
+    width: 100%;
+    background-color```
