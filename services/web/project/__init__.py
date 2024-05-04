@@ -22,7 +22,7 @@ connection = engine.connect()
 def make_cookie(username, password):
     response = make_response(redirect('/'))
     response.set_cookie('username', username)
-    response.set_password('password', password)
+    response.set_cookie('password', password)
     return response
 
 
@@ -56,7 +56,7 @@ def get_messages(a):
         message,
         created_at,
         id
-        FROM messages ORDER BY created_at DESC LIMIT 40 OFFEST :offset;""")
+        FROM messages ORDER BY created_at DESC LIMIT 40 OFFSET :offset;""")
     res = connection.execute(sql, {'offset': a})
 
     for row_messages in res.fetchall():
@@ -132,30 +132,31 @@ def root():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     debug_info()
+
     username = request.cookies.get('username')
     password = request.cookies.get('password')
-    good_credentials = credential_check(username, password)
-    print('good_credentials = ', good_credentials)
 
+    good_credentials = credential_check(username, password)
+    print('good_credentials', good_credentials)
     if good_credentials:
         return redirect('/')
 
     username = request.form.get('username')
     password = request.form.get('password')
+
     good_credentials = credential_check(username, password)
-    print('good credentials = ', good_credentials)
+    print('good_credentials', good_credentials)
+
+    if password is None and username is None:
+        return render_template('login.html')
 
     if username is None:
         return render_template('login.html', bad_credentials=False)
-
     else:
         if not good_credentials:
             return render_template('login.html', bad_credentials=True)
         else:
-            response = make_response(redirect('/'))
-            response.set_cookie('username', username)
-            response.set_cookie('password', password)
-            return response
+            return make_cookie(username, password)
 
 
 @app.route('/logout')
@@ -199,7 +200,7 @@ def create_account():
             return render_template('create_user.html', password_mismatch=True)
         else:
             try:
-                sql = sqlalchemy.sql.test("""INSERT into users (username, password, age) values(:username, :password, :age);
+                sql = sqlalchemy.sql.text("""INSERT into users (username, password, age) values(:username, :password, :age);
                         """)
 
                 res = connection.execute(sql, {
