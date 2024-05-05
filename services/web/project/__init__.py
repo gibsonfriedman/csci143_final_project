@@ -56,8 +56,8 @@ def get_messages(a):
         message,
         created_at,
         id
-        FROM messages ORDER BY created_at DESC LIMIT 20 OFFSET :offset;""")
-    res = connection.execute(sql, {'offset': (a - 1) * 20})
+        FROM messages ORDER BY created_at DESC LIMIT 20 OFFSET :offset * 20;""")
+    res = connection.execute(sql, {'offset': (a - 1)})
 
     for row_messages in res.fetchall():
         sql = sqlalchemy.sql.text("""
@@ -128,8 +128,8 @@ def root():
     except TypeError:
         page_number = 1
     messages = get_messages(page_number)
-    next_page = page_numer + 1
-    prev_page = max(1, page_numer - 1)
+    next_page = page_number + 1
+    prev_page = max(1, page_number - 1)
     return render_template('root.html', messages=messages, good_credentials=good_credentials, username=username, page_number=page_number, next_page=next_page, prev_page=prev_page)
 
 
