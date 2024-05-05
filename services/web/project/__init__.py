@@ -128,7 +128,7 @@ def root():
     messages = get_messages(page_number)
     next_page = page_number + 1
     prev_page = max(1, page_number - 1)
-    return render_template('root.html', messages=messages, good_credentials=good_credentials, username=username, page_number=page_number, next_page=next_page, prev_page=prev_page)
+    return render_template('root.html', messages=messages, logged_in=good_credentials, username=username, page_number=page_number, next_page=next_page, prev_page=prev_page)
 
 
 @app.route('/login', methods=['GET', 'POST'])
