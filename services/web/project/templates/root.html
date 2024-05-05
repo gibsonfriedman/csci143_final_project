@@ -9,12 +9,25 @@
         <tr><th>Sender (age)</th><th>Message</th><th>Created at</th></tr>
         {% for message in messages %}
         <tr>
-            <td class="td">{{message['username']}} ({{message['age']}})</td>
-            <td class="td">{{message['message']|safe}}</td>
-            <td class="td">{{message['created_at']}}</td>
+            <td>{{ message['username'] }} ({{ message['age'] }})</td>
+            <td>{{ message['message']|safe }}</td>
+            <td>{{ message['created_at'] }}</td>
         </tr>
         {% endfor %}
     </table>
     </div>
 </div>
+
+<div>
+    {% if prev_page < page_number %}
+        <a href="?page={{ prev_page }}">Previous</a>
+    {% endif %}
+
+    Page {{ page_number }}
+
+    {% if messages|length == 20 %}
+        <a href="?page={{ next_page }}">Next</a>
+    {% endif %}
+</div>
 {% endblock %}
+

@@ -273,6 +273,7 @@ def search():
     username = request.cookies.get('username')
     password = request.cookies.get('password')
     good_credentials = credential_check(username, password)
+    print('good_credentials', good_credentials)
     try:
         page_number = int(request.args.get('page', 1))
     except TypeError:

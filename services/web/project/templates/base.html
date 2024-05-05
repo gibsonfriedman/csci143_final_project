@@ -1,13 +1,13 @@
 <html>
     <head>
-        <title>CS40 Twitter Clone</title>
+        <title>Twitter Clone</title>
     </head>
     <body>
-        <h1>CS40 Twitter Clone :)</h1>
+        <h1>Twitter Clone</h1>
         <ol>
             <li><a href='/'>Home</a></li>
             <li><a href='/search'>Search</a></li>
-            {% if good_credentials %}
+            {% if logged_in %}
             <li><a href='/create_message'>Create Message</a></li>
             <li><a href='/logout'>Logout</a></li>
             {% else %}
