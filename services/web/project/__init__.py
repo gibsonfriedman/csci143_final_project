@@ -56,8 +56,8 @@ def get_messages(a):
         message,
         created_at,
         id
-        FROM messages ORDER BY created_at DESC LIMIT 40 OFFSET :offset;""")
-    res = connection.execute(sql, {'offset': a})
+        FROM messages ORDER BY created_at DESC LIMIT 20 OFFSET :offset;""")
+    res = connection.execute(sql, {'offset': (a - 1) * 20})
 
     for row_messages in res.fetchall():
         sql = sqlalchemy.sql.text("""
@@ -85,8 +85,8 @@ def query_messages(query, a):
         SELECT sender_id,
         ts_headline(
             message, to_tsquery(:query),
-            'StartSel = "<span class = query><b>",
-            StopSel = "</b></span>"')
+            'StartSel = "<mark><b>",
+            StopSel = "</b></mark>"')
         AS highlighted_message,
         created_at,
         messages.id,
@@ -96,17 +96,16 @@ def query_messages(query, a):
         WHERE to_tsvector('english', message) @@ to_tsquery(:query)
         ORDER BY to_tsvectory(message) <=> to_tsquery(:query),
         created_at DESC LIMIT 20 OFFSET :offset;""")
-    print('inside query_messages')
 
     res = connection.execute(sql, {
-        'offset': 40 * (a - 1),
+        'offset': 20 * (a - 1),
         'query': ' & '.join(query.split())
     })
 
     messages = []
     for row_messages in res.fetchall():
         message = row_messages[1]
-        cleaned_message = bleach.clean(message, tags=['b', 'span'], attributes={'span': ['class']})
+        cleaned_message = bleach.clean(message, tags=['b', 'mark'])
         linked_message = bleach.linkify(cleaned_message)
         messages.append({
             'id': row_messages[3],
@@ -124,9 +123,14 @@ def root():
     password = request.cookies.get('password')
     good_credentials = credential_check(username, password)
     print('good_credentials', good_credentials)
-    page_number = int(request.args.get('page', 1))
+    try:
+        page_number = int(request.args.get('page', 1))
+    except TypeError:
+        page_number = 1
     messages = get_messages(page_number)
-    return render_template('root.html', messages=messages, good_credentials=good_credentials, username=username, page_number=page_number)
+    next_page = page_numer + 1
+    prev_page = max(1, page_numer - 1)
+    return render_template('root.html', messages=messages, good_credentials=good_credentials, username=username, page_number=page_number, next_page=next_page, prev_page=prev_page)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -271,27 +275,21 @@ def search():
     username = request.cookies.get('username')
     password = request.cookies.get('password')
     good_credentials = credential_check(username, password)
-    if good_credentials:
-        logged_in = True
-    else:
-        logged_in = False
-    print('logged-in=', logged_in)
-
-    page_number = int(request.args.get('page', 1))
-
+    try:
+        page_number = int(request.args.get('page', 1))
+    except TypeError:
+        page_number = 1
+    next_page = page_number + 1
+    prev_page = max(1, page_number - 1)
     if request.form.get('query'):
         query = request.form.get('query')
     else:
         query = request.args.get('query', '')
-
-    print('before query_messages')
-
     if query:
         messages = query_messages(query, page_number)
     else:
         messages = get_messages(page_number)
-
-    response = make_response(render_template('search.html', messages=messages, logged_in=logged_in, username=username, page_number=page_number, query=query))
+    response = make_response(render_template('search.html', messages=messages, logged_in=good_credentials, username=username, page_number=page_number, next_page=next_page, prev_page=prev_page, query=query))
     if query:
         response.set_cookie('query', query)
 
