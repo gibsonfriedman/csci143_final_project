@@ -82,23 +82,21 @@ def get_messages(a):
 
 def query_messages(query, a):
     sql = sqlalchemy.sql.text("""
-        SELECT sender_id,
-        ts_headline(
-            message, to_tsquery(:query),
-            'StartSel = "<mark><b>",
-            StopSel = "</b></mark>"')
-        AS highlighted_message,
-        created_at,
-        messages.id,
-        username,
-        age
-        FROM messages JOIN users ON (messages.sender_id = users.id)
-        WHERE to_tsvector('english', message) @@ to_tsquery(:query)
-        ORDER BY to_tsvectory(message) <=> to_tsquery(:query),
-        created_at DESC LIMIT 20 OFFSET :offset;""")
-
+    SELECT sender_id,
+    ts_headline(
+        message, plainto_tsquery(:query),
+        'StartSel="<mark><b>", StopSel="</b></mark>"')
+    AS highlighted_message,
+    created_at,
+    messages.id,
+    username,
+    age
+    FROM messages JOIN users ON (messages.sender_id = users.id)
+    WHERE to_tsvector('english', message) @@ plainto_tsquery(:query)
+    ORDER BY ts_rank_cd(to_tsvector('english', message), plainto_tsquery(:query)) DESC,
+    created_at DESC LIMIT 20 OFFSET :offset;""")
     res = connection.execute(sql, {
-        'offset': 20 * (a - 1),
+        'offset': (a - 1) * 20,
         'query': ' & '.join(query.split())
     })
 
