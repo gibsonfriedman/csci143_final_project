@@ -12,7 +12,7 @@ fake = Faker()
 
 def create_engine(db_url):
     """Create and return a SQLAlchemy engine."""
-    engine = sqlalchemy.create_engine(db_url, echo=False, future=True)
+    engine = sqlalchemy.create_engine(db_url, echo=False, future=True, connect_args={"sslmode": "disable"})
     return engine
 
 def insert_users(session, n_rows):
